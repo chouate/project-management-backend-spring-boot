@@ -4,8 +4,10 @@ import com.hps.clientservice.dtos.ClientDTO;
 import com.hps.clientservice.entities.Client;
 import com.hps.clientservice.exceptions.ResourceAlreadyExistException;
 import com.hps.clientservice.exceptions.ResourceNotFoundException;
+import com.hps.clientservice.models.User;
 import com.hps.clientservice.patchers.ClientPatcher;
 import com.hps.clientservice.repositories.ClientRepository;
+import com.hps.clientservice.restClients.UserRestClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +17,13 @@ import java.util.Optional;
 public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientPatcher clientPatcher;
+    private final UserRestClient userRestClient;
 
 
-    public ClientService(ClientRepository clientRepository, ClientPatcher clientPatcher) {
+    public ClientService(ClientRepository clientRepository, ClientPatcher clientPatcher, UserRestClient userRestClient) {
         this.clientRepository = clientRepository;
         this.clientPatcher = clientPatcher;
+        this.userRestClient = userRestClient;
     }
 
 
@@ -30,6 +34,16 @@ public class ClientService {
     public List<Client> getClientsByDirectorId(Long directorId){
         return this.clientRepository.findClientByDirectorId(directorId);
     }
+
+    public List<Client> getClientsByPM(Long id){
+        User pm = this.userRestClient.getPMById(id);
+        System.out.println("pm = "+pm);
+        if(pm.getId() == null){
+            throw new ResourceNotFoundException("The project manager with id '"+id+"' Not found.");
+        }
+        return this.clientRepository.findClientByProjectManagerId(id);
+    }
+
 
     public Client getClientById(Long id){
         return clientRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("The client with id '"+id+"' Not found."));

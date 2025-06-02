@@ -34,7 +34,7 @@ public class Client {
     private Date endDateEstimate;
 
     private Long projectManagerId; // 🔗 lien vers l'utilisateur (chef de projet)
-    private Long directorId;  // 🔗 lien vers l'utilisateur (direceur)
+    private Long directorId;  // 🔗 lien vers l'utilisateur (directeur)
     @Transient
     private User projectManager;
     @Transient

@@ -69,6 +69,18 @@ public class ClientController {
         return listClients;
     }
 
+    @GetMapping("/projectManagers/{id}/clients")
+    public List<Client> getClientsByPM(@PathVariable Long id){
+        List<Client> listClients = this.clientService.getClientsByPM( id);
+        listClients.forEach(client -> {
+            User director = this.userRestClient.getDirectorById(client.getDirectorId());
+            User projectManager = this.userRestClient.getPMById(client.getProjectManagerId());
+            client.setDirector(director);
+            client.setProjectManager(projectManager);
+        });
+        return listClients;
+    }
+
     @PostMapping("/clients")
     public ResponseEntity<Client> createNewClient(@Valid @RequestBody Client client){
         Client saved =this.clientService.createNewClient(client);
