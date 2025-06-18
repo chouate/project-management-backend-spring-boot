@@ -12,13 +12,13 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class StatusPhase {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @Column(unique = true, nullable = true)
     private String name;
     private String description;
-    @OneToMany(mappedBy = "status")
-    @JsonIgnore
-    private List<Phase> listPhase;
+//    @OneToMany(mappedBy = "status")
+//    @JsonIgnore
+//    private List<Phase> listPhase;
 
     public StatusPhase(String name, String description) {
         this.name = name;

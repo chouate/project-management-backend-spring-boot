@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface StatusService {
     public List<StatusPhase> getAllStatuses();
-    public StatusPhase getStatusById(Integer id);
+    public StatusPhase getStatusById(Long id);
     public StatusPhase getStatusByName(String name);
     public StatusPhase createNewStatus(StatusPhase status);
-    public StatusPhase updateStatus(Integer id, StatusPhase status);
-    public void deleteStatusById(Integer id);
+    public StatusPhase updateStatus(Long id, StatusPhase status);
+    public void deleteStatusById(Long id);
 }

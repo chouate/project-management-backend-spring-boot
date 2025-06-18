@@ -22,7 +22,7 @@ public class PhaseServiceImpl implements PhaseService {
     }
 
     @Override
-    public Phase getPhaseById(Integer id) {
+    public Phase getPhaseById(Long id) {
         return phaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Phase not found with id: " + id));
     }
@@ -38,16 +38,16 @@ public class PhaseServiceImpl implements PhaseService {
     }
 
     @Override
-    public Phase updatePhase(Integer id, Phase updatedPhase) {
+    public Phase updatePhase(Long id, Phase updatedPhase) {
         Phase existing = getPhaseById(id);
         existing.setName(updatedPhase.getName());
         existing.setDescription(updatedPhase.getDescription());
-        existing.setStatus(updatedPhase.getStatus());
+        //existing.setStatus(updatedPhase.getStatus());
         return phaseRepository.save(existing);
     }
 
     @Override
-    public void deletePhaseById(Integer id) {
+    public void deletePhaseById(Long id) {
         phaseRepository.deleteById(id);
     }
 

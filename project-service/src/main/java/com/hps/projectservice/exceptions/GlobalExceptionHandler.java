@@ -1,5 +1,6 @@
 package com.hps.projectservice.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,5 +19,16 @@ public class GlobalExceptionHandler {
         body.put("message", ex.getMessage());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String >> handleConstraintViolationException(ConstraintViolationException exception){
+        Map<String, String> errors = new HashMap<>();
+        exception.getConstraintViolations().forEach(constraintViolation -> {
+            String field = constraintViolation.getPropertyPath().toString();
+            String message = constraintViolation.getMessage();
+            errors.put(field, message);
+        });
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 }

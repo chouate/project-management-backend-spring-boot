@@ -1,0 +1,5 @@
+package com.hps.projectservice.enums;
+
+public enum PhaseEnum {
+    STUDY, WORKLOAD_ESTIMATION, DEVELOPMENT,UNIT_TESTING, TESTING_WITH_CLIENT, PRODUCTION_DEPLOYMENT
+}

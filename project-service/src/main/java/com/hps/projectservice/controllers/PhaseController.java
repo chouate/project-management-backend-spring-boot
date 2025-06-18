@@ -23,7 +23,7 @@ public class PhaseController {
     }
 
     @GetMapping("/{id}")
-    public Phase getPhase(@PathVariable int id) {
+    public Phase getPhase(@PathVariable Long id) {
         return phaseService.getPhaseById(id);
     }
 
@@ -33,12 +33,12 @@ public class PhaseController {
     }
 
     @PutMapping("/{id}")
-    public Phase updatePhase(@PathVariable int id, @RequestBody Phase phase) {
+    public Phase updatePhase(@PathVariable Long id, @RequestBody Phase phase) {
         return phaseService.updatePhase(id, phase);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePhase(@PathVariable int id) {
+    public void deletePhase(@PathVariable Long id) {
         phaseService.deletePhaseById(id);
     }
 

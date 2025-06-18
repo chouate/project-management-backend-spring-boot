@@ -8,10 +8,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/statuses")
-public class StatusController {
+public class PhaseStatusController {
     private final StatusService statusService;
 
-    public StatusController(StatusService statusService) {
+    public PhaseStatusController(StatusService statusService) {
         this.statusService = statusService;
     }
 
@@ -21,7 +21,7 @@ public class StatusController {
     }
 
     @GetMapping("/{id}")
-    public StatusPhase getStatus(@PathVariable int id) {
+    public StatusPhase getStatus(@PathVariable Long id) {
         return statusService.getStatusById(id);
     }
 
@@ -31,12 +31,12 @@ public class StatusController {
     }
 
     @PutMapping("/{id}")
-    public StatusPhase updateStatus(@PathVariable int id, @RequestBody StatusPhase status) {
+    public StatusPhase updateStatus(@PathVariable Long id, @RequestBody StatusPhase status) {
         return statusService.updateStatus(id, status);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStatus(@PathVariable int id) {
+    public void deleteStatus(@PathVariable Long id) {
         statusService.deleteStatusById(id);
     }
 }

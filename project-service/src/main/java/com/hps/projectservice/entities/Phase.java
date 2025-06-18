@@ -12,16 +12,16 @@ import java.util.List;
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Phase {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @Column(unique = true, nullable = true)
     private String name;
     private String description;
-    @ManyToOne
-    private StatusPhase status;
+//    @ManyToOne
+//    private StatusPhase status;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "phase")
-    private List<Project> listProjects;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "phase")
+//    private List<Project> listProjects;
 
     public Phase(String name, String description) {
         this.name = name;

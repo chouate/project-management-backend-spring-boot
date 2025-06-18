@@ -2,7 +2,7 @@ package com.hps.projectservice.services.implementations;
 
 import com.hps.projectservice.entities.StatusPhase;
 import com.hps.projectservice.exceptions.ResourceNotFoundException;
-import com.hps.projectservice.repositories.StatusRepository;
+import com.hps.projectservice.repositories.PhaseStatusRepository;
 import com.hps.projectservice.services.interfaces.StatusService;
 import org.springframework.stereotype.Service;
 
@@ -10,42 +10,42 @@ import java.util.List;
 
 @Service
 public class StatusServiceImpl implements StatusService {
-    private final StatusRepository statusRepository;
+    private final PhaseStatusRepository phaseStatusRepository;
 
-    public StatusServiceImpl(StatusRepository statusRepository) {
-        this.statusRepository = statusRepository;
+    public StatusServiceImpl(PhaseStatusRepository phaseStatusRepository) {
+        this.phaseStatusRepository = phaseStatusRepository;
     }
 
     @Override
     public List<StatusPhase> getAllStatuses() {
-        return statusRepository.findAll();
+        return phaseStatusRepository.findAll();
     }
 
     @Override
-    public StatusPhase getStatusById(Integer id) {
-        return statusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("StatusPhase not found with Id : "+id));
+    public StatusPhase getStatusById(Long id) {
+        return phaseStatusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("StatusPhase not found with Id : "+id));
     }
 
     @Override
     public StatusPhase getStatusByName(String name) {
-        return statusRepository.findStatusByName(name).orElseThrow(()-> new ResourceNotFoundException("StatusPhase not found whith name : "+name));
+        return phaseStatusRepository.findStatusByName(name).orElseThrow(()-> new ResourceNotFoundException("StatusPhase not found whith name : "+name));
     }
 
     @Override
     public StatusPhase createNewStatus(StatusPhase status) {
-        return statusRepository.save(status);
+        return phaseStatusRepository.save(status);
     }
 
     @Override
-    public StatusPhase updateStatus(Integer id, StatusPhase status) {
-        StatusPhase existingStatus = statusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("StatusPhase, to update, not found with id : "+id));
+    public StatusPhase updateStatus(Long id, StatusPhase status) {
+        StatusPhase existingStatus = phaseStatusRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("StatusPhase, to update, not found with id : "+id));
         existingStatus.setName(status.getName());
         existingStatus.setDescription(status.getDescription());
-        return statusRepository.save(existingStatus);
+        return phaseStatusRepository.save(existingStatus);
     }
 
     @Override
-    public void deleteStatusById(Integer id) {
-        statusRepository.deleteById(id);
+    public void deleteStatusById(Long id) {
+        phaseStatusRepository.deleteById(id);
     }
 }

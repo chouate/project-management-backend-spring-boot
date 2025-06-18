@@ -1,5 +1,5 @@
 package com.hps.projectservice.enums;
 
 public enum ProjectStatusEnum {
-    IN_PROGRESS, Compeleted, Closed
+    TO_COME,IN_PROGRESS, PENDING,COMPLETED, CLOSED,
 }
