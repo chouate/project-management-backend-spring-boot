@@ -229,6 +229,7 @@ public class ProjectServiceImpl implements ProjectService {
         existingProject .setProgress(updatedProject.getProgress());
         existingProject .setActualWorkDays(updatedProject.getActualWorkDays());
         existingProject .setEstimatedWorkDays(updatedProject.getEstimatedWorkDays());
+        existingProject .setDuration(updatedProject.getDuration());
         existingProject .setStartDate(updatedProject.getStartDate());
         existingProject .setEndDate(updatedProject.getEndDate());
         existingProject .setDeliveryDate(updatedProject.getDeliveryDate());
@@ -287,6 +288,32 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(Long id) {
         Project existing = getProjectById(id);
         projectRepository.delete(existing);
+    }
+
+    @Override
+    public void recalculateActualWorkDays(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found with id : "+projectId));
+
+        // Appel vers task-service pour récupérer toutes les tâches du projet
+        List<Task> tasks = taskRestClient.getAllTasksByProjectId(project.getId());
+        //List<TaskDTO> tasks = taskClient.getTasksByProjectId(projectId);
+
+        int totalActualWorkDays = 0;
+        for (Task task : tasks) {
+            totalActualWorkDays += task.getActualWorkDays();
+        }
+
+        // Calcul et mise à jour du progrès du projet (peut dépasser 100 %)
+        if (project.getEstimatedWorkDays() > 0) {
+            int progress = Math.round((totalActualWorkDays * 100.0f) / project.getEstimatedWorkDays());
+            project.setProgress(progress);
+        } else {
+            project.setProgress(0); // ou null selon la logique métier
+        }
+
+        project.setActualWorkDays(totalActualWorkDays);
+        projectRepository.save(project);
     }
 
 

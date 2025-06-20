@@ -2,6 +2,7 @@ package com.hps.taskservice.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hps.taskservice.models.Project;
+import com.hps.taskservice.models.Technology;
 import com.hps.taskservice.models.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -25,7 +26,8 @@ public class Task {
     private int completionPercentage;
     private int actualWorkDays;
     private int assignmentRate; // 100% or 50%
-    private int estimatedWorkDays;
+    private int estimatedWorkDays; // jrs/homme
+    private int duration; // jrs
 
     //@JsonFormat(pattern = "dd/MM/yyyy")
     private Date startDate;
@@ -46,5 +48,9 @@ public class Task {
     private Long ownerId;
     @Transient
     private User owner;
+
+    private Long technologyId; // ID de la technologie (FK)
+    @Transient
+    private Technology technology;
 
 }

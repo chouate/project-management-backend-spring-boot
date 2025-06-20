@@ -6,6 +6,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @FeignClient(name = "project-service")
 public interface ProjectRestClient {
@@ -22,5 +23,9 @@ public interface ProjectRestClient {
         project.setStatus("Status Domain Not Available");
         return project;
     }
+
+    @PutMapping("/api/projects/{id}/recalculate-actual-workdays")
+    void recalculateActualWorkDays(@PathVariable("id") Long projectId);
+
 
 }

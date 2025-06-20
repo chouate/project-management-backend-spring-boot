@@ -16,7 +16,8 @@ public class Task {
     private int completionPercentage;
     private int actualWorkDays;
     private int assignmentRate; // 100% or 50%
-    private int estimatedWorkDays;
+    private int estimatedWorkDays; // man/days
+    private int duration; // days
 
     private Date startDate;
     private Date endDate;
@@ -25,6 +26,8 @@ public class Task {
 
     private Long projectId;
 
+    private Long technologyId;
+    private Technology technology;
 
     private Long ownerId;
     private User owner;

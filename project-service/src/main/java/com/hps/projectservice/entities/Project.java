@@ -25,6 +25,7 @@ public class Project {
     private int progress;
     private int actualWorkDays;
     private int estimatedWorkDays;
+    private int duration;
 
     private Date startDate;
     private Date endDate;

@@ -4,6 +4,7 @@ import com.hps.taskservice.entities.Task;
 import com.hps.taskservice.entities.TaskStatus;
 import com.hps.taskservice.exceptions.ResourceNotFoundException;
 import com.hps.taskservice.models.Project;
+import com.hps.taskservice.models.Technology;
 import com.hps.taskservice.models.User;
 import com.hps.taskservice.repositories.TaskRepository;
 import com.hps.taskservice.repositories.TaskStatusRepository;
@@ -41,6 +42,11 @@ public class TaskServiceImp implements TaskService {
                 User owner = this.userRestClient.getOwnerById(task.getOwnerId());
                 task.setOwner(owner);
             }
+            if (task.getTechnologyId() != null) {
+                Technology tech = userRestClient.getTechnologyById(task.getTechnologyId());
+                task.setTechnology(tech);
+            }
+
         }
 
         return tasks;
@@ -61,6 +67,11 @@ public class TaskServiceImp implements TaskService {
             task.setOwner(owner);
         }
 
+        if (task.getTechnologyId() != null) {
+            Technology tech = userRestClient.getTechnologyById(task.getTechnologyId());
+            task.setTechnology(tech);
+        }
+
         return task;
     }
 
@@ -73,17 +84,26 @@ public class TaskServiceImp implements TaskService {
             task.setStatus(status);
         }
 
-//        if(task.getProjectId() != null){
-//            Project p = this.projectRestClient.getProjectById(task.getProjectId());
-//            task.setProject(p);
-//        }
-
         if(task.getOwnerId() != null){
             User owner = this.userRestClient.getOwnerById(task.getOwnerId());
             task.setOwner(owner);
         }
-        //Save the task
-        return this.taskRepository.save(task);
+        if (task.getTechnologyId() != null) {
+            Technology tech = userRestClient.getTechnologyById(task.getTechnologyId());
+            task.setTechnology(tech);
+        }
+
+//        //Save the task
+//        return this.taskRepository.save(task);
+        // Sauvegarder la tâche
+        Task savedTask = this.taskRepository.save(task);
+
+        // ⚠️ Recalculer seulement si actualWorkDays > 0
+        if (savedTask.getActualWorkDays() != 0 && savedTask.getActualWorkDays() > 0) {
+            projectRestClient.recalculateActualWorkDays(savedTask.getProjectId());
+        }
+
+        return savedTask;
     }
 
     @Override
@@ -97,6 +117,7 @@ public class TaskServiceImp implements TaskService {
         taskExisting.setActualWorkDays(updatedTask.getActualWorkDays());
         taskExisting.setAssignmentRate(updatedTask.getAssignmentRate());
         taskExisting.setEstimatedWorkDays(updatedTask.getEstimatedWorkDays());
+        taskExisting.setDuration(updatedTask.getDuration());
         taskExisting.setStartDate(updatedTask.getStartDate());
         taskExisting.setEndDate(updatedTask.getEndDate());
         // Task Status
@@ -118,7 +139,18 @@ public class TaskServiceImp implements TaskService {
             taskExisting.setOwner(owner);
         }
 
-        return this.taskRepository.save(taskExisting);
+        taskExisting.setTechnologyId(updatedTask.getTechnologyId());
+        if(updatedTask.getTechnologyId() != null){
+            Technology tech = userRestClient.getTechnologyById(updatedTask.getTechnologyId());
+            taskExisting.setTechnology(tech);
+        }
+
+        Task savedTask = this.taskRepository.save(taskExisting);
+
+        // Appel vers project-service pour recalculer le champ actualWorkDays
+        projectRestClient.recalculateActualWorkDays(savedTask.getProjectId());
+
+        return savedTask;
     }
 
     @Override

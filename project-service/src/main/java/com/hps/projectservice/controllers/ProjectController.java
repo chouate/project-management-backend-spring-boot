@@ -51,4 +51,11 @@ public class ProjectController {
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }
+
+    @PutMapping("/projects/{id}/recalculate-actual-workdays")
+    public ResponseEntity<Void> recalculateActualWorkDays(@PathVariable Long id) {
+        projectService.recalculateActualWorkDays(id);
+        return ResponseEntity.ok().build();
+    }
+
 }
