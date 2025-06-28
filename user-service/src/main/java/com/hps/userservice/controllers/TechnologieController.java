@@ -31,7 +31,7 @@ public class TechnologieController {
     }
 
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public Technology createNewTechnologie(@Valid @RequestBody Technology technology){
         return technologieService.createTechnologie(technology);
     }

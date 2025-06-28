@@ -1,8 +1,12 @@
 package com.hps.taskservice.services.interfaces;
 
+import com.hps.taskservice.dtos.DailyChargeInfo;
+import com.hps.taskservice.dtos.TaskUpdateDTO;
 import com.hps.taskservice.entities.Task;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface TaskService {
     //List<Task> getAllTasks();
@@ -11,4 +15,8 @@ public interface TaskService {
     Task createTask(Task task);
     Task updateTask(Long id, Task task);
     void deleteTask(Long id);
+    Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate);
+    List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate);
+    List<Task> getTasksByOwnerId(Long ownerId);
+    Task updateTaskMinimal(Long id, TaskUpdateDTO dto);
 }

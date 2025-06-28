@@ -45,6 +45,8 @@ public class Task {
 //    @Transient
 //    private Project project;
 
+    private String projectName;
+
     private Long ownerId;
     @Transient
     private User owner;

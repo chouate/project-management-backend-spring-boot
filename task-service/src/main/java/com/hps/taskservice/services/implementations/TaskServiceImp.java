@@ -1,5 +1,7 @@
 package com.hps.taskservice.services.implementations;
 
+import com.hps.taskservice.dtos.DailyChargeInfo;
+import com.hps.taskservice.dtos.TaskUpdateDTO;
 import com.hps.taskservice.entities.Task;
 import com.hps.taskservice.entities.TaskStatus;
 import com.hps.taskservice.exceptions.ResourceNotFoundException;
@@ -13,7 +15,9 @@ import com.hps.taskservice.restClients.UserRestClient;
 import com.hps.taskservice.services.interfaces.TaskService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 public class TaskServiceImp implements TaskService {
@@ -154,8 +158,143 @@ public class TaskServiceImp implements TaskService {
     }
 
     @Override
+    public Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate) {
+        List<Task> tasks = taskRepository.findByOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                ownerId, endDate, startDate);
+
+        int totalOverlapDays = 0;
+        long durationInDays = 0;
+
+        // Calculer les jours ouvrables (hors week-ends) dans la période demandée
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+
+        while (!calendar.getTime().after(endDate)) {
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY) {
+                durationInDays++;
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        // Calculer la charge réelle sur les jours ouvrables
+        for (Task task : tasks) {
+            Date taskStart = task.getStartDate();
+            Date taskEnd = task.getEndDate();
+
+            Date effectiveStart = taskStart.after(startDate) ? taskStart : startDate;
+            Date effectiveEnd = taskEnd.before(endDate) ? taskEnd : endDate;
+
+//            long overlap = ChronoUnit.DAYS.between(effectiveStart.toInstant(), effectiveEnd.toInstant()) + 1;
+//            totalOverlapDays += overlap;
+            calendar.setTime(effectiveStart);
+
+            while (!calendar.getTime().after(effectiveEnd)) {
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY) {
+                    totalOverlapDays++;
+                }
+                calendar.add(Calendar.DATE, 1);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("chargeDays", totalOverlapDays);
+        result.put("maxDays", durationInDays);
+        result.put("isAvailable", totalOverlapDays < durationInDays);
+        result.put("comment", "Load: " + totalOverlapDays + " days out of " + durationInDays);
+
+        return result;
+    }
+
+    @Override
+    public List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate) {
+        List<Task> tasks = taskRepository.findByOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
+                ownerId, endDate, startDate);
+
+        List<DailyChargeInfo> results = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+
+        while (!calendar.getTime().after(endDate)) {
+            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            if (dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY) {
+                Date currentDay = calendar.getTime();
+                boolean available = true;
+                String taskName = null;
+                String projectName = null;
+
+                for (Task task : tasks) {
+                    if (!task.getStartDate().after(currentDay) && !task.getEndDate().before(currentDay)) {
+                        available = false;
+                        taskName = task.getName();
+                        try {
+                            Project project = projectRestClient.getProjectById(task.getProjectId());
+                            projectName = project.getName();
+                        } catch (Exception e) {
+                            projectName = "(Projet introuvable)";
+                        }
+                        break;
+                    }
+                }
+
+                String formattedDate = new SimpleDateFormat("MM/dd/yyyy").format(currentDay);
+                results.add(new DailyChargeInfo(formattedDate, available, taskName, projectName));
+            }
+            calendar.add(Calendar.DATE, 1);
+        }
+
+        return results;
+    }
+
+
+    @Override
     public void deleteTask(Long id) {
         Task taskExisting = getTaskById(id);
         this.taskRepository.delete(taskExisting);
     }
+
+    @Override
+    public List<Task> getTasksByOwnerId(Long ownerId) {
+        List<Task> tasks = taskRepository.findByOwnerId(ownerId);
+
+        for (Task task : tasks) {
+            if (task.getProjectId() != null) {
+                Project p = this.projectRestClient.getProjectById(task.getProjectId());
+                task.setProjectName(p.getName());
+            }
+            if (task.getOwnerId() != null) {
+                User owner = this.userRestClient.getOwnerById(task.getOwnerId());
+                task.setOwner(owner);
+            }
+            if (task.getTechnologyId() != null) {
+                Technology tech = userRestClient.getTechnologyById(task.getTechnologyId());
+                task.setTechnology(tech);
+            }
+
+        }
+        return tasks;
+    }
+
+    @Override
+    public Task updateTaskMinimal(Long id, TaskUpdateDTO dto) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+
+        if (dto.getCompletionPercentage() != null) {
+            task.setCompletionPercentage(dto.getCompletionPercentage());
+        }
+
+        // Mettre à jour le statut à partir du nom fourni dans le DTO
+        if (dto.getStatus() != null) {
+            TaskStatus status = taskStatusRepository.findByName(dto.getStatus())
+                    .orElseThrow(() -> new ResourceNotFoundException("TaskStatus not found with name: " + dto.getStatus()));
+            task.setStatus(status);
+        }
+
+        //task.setLastModified(new Date()); // facultatif
+        return taskRepository.save(task);
+    }
+
+
 }
