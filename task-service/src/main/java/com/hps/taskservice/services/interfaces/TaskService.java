@@ -15,8 +15,8 @@ public interface TaskService {
     Task createTask(Task task);
     Task updateTask(Long id, Task task);
     void deleteTask(Long id);
-    Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate);
-    List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate);
+    Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate, Long excludeTaskId);
+    List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate, Long excludeTaskId);
     List<Task> getTasksByOwnerId(Long ownerId);
     Task updateTaskMinimal(Long id, TaskUpdateDTO dto);
 }

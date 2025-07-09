@@ -51,9 +51,11 @@ public class TaskController {
     public ResponseEntity<Map<String, Object>> getOwnerAvailabilityBetweenDates(
             @PathVariable Long ownerId,
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(value = "excludeTaskId", required = false) Long excludeTaskId
+    ) {
 
-        Map<String, Object> result = taskService.getOwnerAvailabilityBetweenDates(ownerId, startDate, endDate);
+        Map<String, Object> result = taskService.getOwnerAvailabilityBetweenDates(ownerId, startDate, endDate, excludeTaskId);
         return ResponseEntity.ok(result);
     }
 
@@ -61,9 +63,11 @@ public class TaskController {
     public ResponseEntity<List<DailyChargeInfo>> getOwnerChargeDetails(
             @PathVariable Long ownerId,
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(value = "excludeTaskId", required = false) Long excludeTaskId
+    ) {
 
-        List<DailyChargeInfo> details = taskService.getOwnerChargeDetails(ownerId, startDate, endDate);
+        List<DailyChargeInfo> details = taskService.getOwnerChargeDetails(ownerId, startDate, endDate, excludeTaskId);
         return ResponseEntity.ok(details);
     }
 

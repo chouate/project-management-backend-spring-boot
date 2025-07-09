@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TaskServiceImp implements TaskService {
@@ -158,9 +159,15 @@ public class TaskServiceImp implements TaskService {
     }
 
     @Override
-    public Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate) {
+    public Map<String, Object> getOwnerAvailabilityBetweenDates(Long ownerId, Date startDate, Date endDate, Long excludeTaskId) {
         List<Task> tasks = taskRepository.findByOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                 ownerId, endDate, startDate);
+
+        if(excludeTaskId != null){
+            tasks = tasks.stream()
+                    .filter(t -> !t.getId().equals(excludeTaskId))
+                    .collect(Collectors.toList());
+        }
 
         int totalOverlapDays = 0;
         long durationInDays = 0;
@@ -208,9 +215,15 @@ public class TaskServiceImp implements TaskService {
     }
 
     @Override
-    public List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate) {
+    public List<DailyChargeInfo> getOwnerChargeDetails(Long ownerId, Date startDate, Date endDate, Long excludeTaskId) {
         List<Task> tasks = taskRepository.findByOwnerIdAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
                 ownerId, endDate, startDate);
+
+        if (excludeTaskId != null) {
+            tasks = tasks.stream()
+                    .filter(t -> !t.getId().equals(excludeTaskId))
+                    .collect(Collectors.toList());
+        }
 
         List<DailyChargeInfo> results = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
